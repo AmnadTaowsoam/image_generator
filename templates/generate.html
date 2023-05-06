@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="text-center my-5">Generate Image</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form method="POST" action="{{ url_for('generate') }}">
+                <div class="form-group">
+                    <label for="prompt">Prompt</label>
+                    <input type="text" class="form-control" id="prompt" name="prompt" placeholder="Enter prompt">
+                </div>
+                <button type="submit" class="btn btn-primary">Generate</button>
+            </form>
+        </div>
+    </div>
+    {% if image %}
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6 text-center">
+                <img src="data:image/png;base64,{{ image }}" class="img-fluid">
+            </div>
+        </div>
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6 text-center">
+                <a href="{{ url_for('download_image', prompt=prompt) }}" class="btn btn-primary" download="generated-image.png">Download</a>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

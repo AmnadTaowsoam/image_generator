@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="text-center my-5">Image Generator</h1>
+            <form method="POST" action="{{ url_for('generate') }}">
+                <div class="form-group">
+                    <label for="prompt">Enter prompt:</label>
+                    <input type="text" class="form-control" id="prompt" name="prompt" required>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Generate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 text-center">
+            <i class="fas fa-spinner fa-spin fa-3x d-none" id="loading-spinner"></i>
+            <img src="" class="img-fluid d-none" id="generated-image">
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 text-center">
+            <a href="" class="btn btn-primary d-none" id="download-button" download>Download</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.8.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder@4.3.0/dist/universal-sentence-encoder.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const form = document.querySelector('form');
+        const spinner = document.querySelector('#loading-spinner');
+        const image = document.querySelector('#generated-image');
+        const downloadButton = document.querySelector('#download-button');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            spinner.classList.remove('d-none');
+            image.classList.add('d-none');
+            downloadButton.classList.add('d-none');
+
+            const prompt = event.target.elements.prompt.value;
+
+            axios.post('/generate', {
+                prompt: prompt,
+            })
+            .then((response) => {
+                const imageSrc = response.data;
+                spinner.classList.add('d-none');
+                image.src = `data:image/png;base64,${imageSrc}`;
+                image.classList.remove('d-none');
+                downloadButton.href = `data:image/png;base64,${imageSrc}`;
+                downloadButton.classList.remove('d-none');
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+        });
+    </script>
+{% endblock %}
